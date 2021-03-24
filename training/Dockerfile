@@ -1,0 +1,58 @@
+FROM python:3.9.2-slim
+
+LABEL AUTHOR="Henrique Dezani"
+LABEL COMPANY="Elo7"
+LABEL DATE="22/03/2021"
+
+# Build arguments to set non-root user
+ARG USER_ID=1000
+ARG GROUP_ID=1000 
+
+# Environment variables to configure JupyterLab
+ENV JUPYTER_HOST="0.0.0.0" \
+    JUPYTER_PORT="8888" \
+    JUPYTER_GROUP="elo7" \
+    JUPYTER_USER="developer" \
+    JUPYTER_HOME_DIR="/home/developer/" \
+    JUPYTER_NB_DIR="/usr/src/notebooks"
+
+# Work directory inside container
+WORKDIR ${JUPYTER_NB_DIR}
+
+# Install Debian Slim packages
+ADD packages.txt .
+RUN apt-get update -y -qq && xargs -ra packages.txt apt-get install -y -qq
+
+RUN pip install --upgrade pip
+
+# Install JupyterLab
+RUN pip install jupyterlab
+
+# RUN apt-get -y install libc-dev
+# RUN apt-get -y install build-essential
+RUN pip install -U pip
+
+# Install Python packages
+ADD requirements.txt .
+RUN pip install -r requirements.txt
+
+RUN python -m spacy download pt_core_news_sm
+
+# Add all other files to the container
+# ADD . .
+
+# Create non-root user jovyan and give appropriate permissions
+RUN groupadd -g ${GROUP_ID} ${JUPYTER_GROUP} \
+  && useradd -u ${USER_ID} -g ${JUPYTER_GROUP} ${JUPYTER_USER} \
+  && mkdir ${JUPYTER_HOME_DIR} \
+  && chown ${USER_ID}:${GROUP_ID} ${JUPYTER_HOME_DIR} ${JUPYTER_NB_DIR}
+
+# Set non-root user jovyan to run JupyterLab
+USER ${USER_ID}:${GROUP_ID}
+
+# Expose JupyterLab to outside the container
+EXPOSE ${JUPYTER_PORT}
+
+# By default, execute JupyterLab
+# CMD jupyter notebook --ip ${JUPYTER_HOST} --port ${JUPYTER_PORT} --notebook-dir ${JUPYTER_NB_DIR}
+CMD jupyter notebook --ip ${JUPYTER_HOST} --port ${JUPYTER_PORT} --no-browser --notebook-dir ${JUPYTER_NB_DIR}

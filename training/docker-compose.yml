@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: henriquedezani/elo7-jupyter
+    container_name: jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ".:/usr/src/notebooks"
+      - "../data:/usr/src/data"
+    env_file: ".env"

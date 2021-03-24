@@ -1,0 +1,8 @@
+flask==1.1.2
+numpy==1.20.0
+scikit-learn==0.24.0
+python-dotenv==0.15.0
+cloudpickle==1.6.0
+unidecode==1.2.0
+spacy==3.0.5
+gensim==3.8.3
