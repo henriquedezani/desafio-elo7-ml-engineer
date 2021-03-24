@@ -1,8 +1,6 @@
 FROM python:3.9.2-slim
 
-LABEL AUTHOR="Henrique Dezani"
-LABEL COMPANY="Elo7"
-LABEL DATE="22/03/2021"
+LABEL MAINTAINER="Henrique Dezani"
 
 # Build arguments to set non-root user
 ARG USER_ID=1000
@@ -28,8 +26,6 @@ RUN pip install --upgrade pip
 # Install JupyterLab
 RUN pip install jupyterlab
 
-# RUN apt-get -y install libc-dev
-# RUN apt-get -y install build-essential
 RUN pip install -U pip
 
 # Install Python packages
@@ -54,5 +50,4 @@ USER ${USER_ID}:${GROUP_ID}
 EXPOSE ${JUPYTER_PORT}
 
 # By default, execute JupyterLab
-# CMD jupyter notebook --ip ${JUPYTER_HOST} --port ${JUPYTER_PORT} --notebook-dir ${JUPYTER_NB_DIR}
 CMD jupyter notebook --ip ${JUPYTER_HOST} --port ${JUPYTER_PORT} --no-browser --notebook-dir ${JUPYTER_NB_DIR}
